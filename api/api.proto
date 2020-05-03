@@ -1,0 +1,56 @@
+syntax = "proto3";
+package api;
+
+message Event {
+    message ID {
+        string id = 1;
+    }
+
+    enum Mode {
+        TIMESTAMP = 0;
+        CRON = 1;
+    }
+
+    string id = 1;
+    string cron_expression = 2;
+
+    // Unix timestamp
+    int64 should_execute_at = 3;
+
+    Mode mode = 4;
+
+    string topic = 5;
+
+    bytes payload = 6;
+}
+
+message ScheduleRequest {
+    Event event = 1;
+}
+
+message ScheduleResponse {
+    Event.ID id = 1;
+}
+
+message UnscheduleRequest {
+    Event.ID id = 1;
+}
+message UnscheduleResponse {
+}
+
+message StreamEventsRequest {
+    string topic = 1;
+}
+
+message StreamEventsResponse {
+    Event event = 1;
+}
+
+service Scheduler {
+    rpc Schedule (ScheduleRequest) returns (ScheduleResponse) {
+    };
+    rpc Unschedule (UnscheduleRequest) returns (UnscheduleResponse) {
+    };
+    rpc StreamEvents (StreamEventsRequest) returns (stream StreamEventsResponse) {
+    };
+}

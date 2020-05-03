@@ -1,0 +1,37 @@
+version: '3.3'
+services:
+  go_test:
+    depends_on:
+      - server
+    build:
+      context: ../
+      dockerfile: ./integration/Dockerfile.test
+    environment:
+      SCHEDULO_ADDR: 'server:9876'
+    links:
+      - server
+  server:
+    restart: always
+    depends_on:
+      - redis
+      - postgres
+    build:
+      context: ../
+      dockerfile: ./cmd/schedulo_server/Dockerfile
+    environment:
+      SCHEDULO_SQL_URL: "host=postgres port=5432 dbname=job_scheduler user=job_scheduler password='job_scheduler' sslmode=disable"
+      SCHEDULO_REDIS_ADDR: "redis:6379"
+      SCHEDULO_ADDR: 0.0.0.0
+    links:
+      - redis
+      - postgres
+  redis:
+    image: redis
+    restart: always
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: job_scheduler
+      POSTGRES_PASSWORD: job_scheduler
+      POSTGRES_DB: job_scheduler

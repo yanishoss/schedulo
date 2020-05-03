@@ -1,0 +1,28 @@
+version: '3.3'
+
+services:
+  go_test:
+    depends_on:
+      - redis
+      - postgres
+    build:
+      context: ../
+      dockerfile: ./test/Dockerfile.test
+    environment:
+      PG_ADDR: postgres
+      REDIS_ADDR: redis:6379
+      SCHEDULO_ADDR: 'schedulo_server:9876'
+    links:
+      - redis
+      - postgres
+      - schedulo_server
+  redis:
+    image: redis
+    restart: always
+  postgres:
+    restart: always
+    image: postgres
+    environment:
+      POSTGRES_USER: job_scheduler
+      POSTGRES_PASSWORD: job_scheduler
+      POSTGRES_DB: job_scheduler
