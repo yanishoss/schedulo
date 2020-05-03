@@ -15,7 +15,6 @@ services:
     links:
       - redis
       - postgres
-      - schedulo_server
   redis:
     image: redis
     restart: always
