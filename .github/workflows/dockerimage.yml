@@ -28,11 +28,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ref: ${{github.ref}}
-    - name: Get the version
-      id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: "WyriHaximus/github-action-get-previous-tag@master"
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     - name: Build the Docker image
-      run: docker build . --file cmd/schedulo_server/Dockerfile --tag schedulo:${{ steps.get_version.outputs.VERSION }}
+      run: docker build . --file cmd/schedulo_server/Dockerfile --tag schedulo:${{ steps.previoustag.outputs.tag }}
     - uses: actions/checkout@master
     - name: Publish to Registry
       uses: elgohr/Publish-Docker-Github-Action@master
@@ -40,4 +42,4 @@ jobs:
         name: germainion/schedulo
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        tags: "latest,${{ steps.get_version.outputs.VERSION }}"
+        tags: "latest,${{ steps.previoustag.outputs.tag }}"
