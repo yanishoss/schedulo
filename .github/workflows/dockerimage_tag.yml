@@ -1,0 +1,39 @@
+name: Docker Image LATEST
+
+on:
+  push:
+    tag:
+      - v*
+  pull_request:
+    tag:
+      - v*
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{github.ref}}
+      - name: Run unit tests
+        id: go_test_unit
+        run: cd test && chmod +x ./run.sh && ./run.sh
+      - name: Run integration tests
+        id: go_test_integration
+        run: cd integration && chmod +x ./run.sh && ./run.sh
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{github.ref}}
+      - name: 'Get Previous tag'
+        id: previoustag
+        run: echo ::set-output name=tag::$(echogit describe --abbrev=0 --tags)
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Build the Docker image
+        run: docker build . --file cmd/schedulo_server/Dockerfile --tag germainion/schedulo:${{steps.previoustag.outputs.tag}} && docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} && docker push germainion/schedulo:${{ steps.previoustag.outputs.tag }}
