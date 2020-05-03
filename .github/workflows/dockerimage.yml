@@ -13,10 +13,10 @@ jobs:
     steps:
       - name: Run unit tests
         id: go_test_unit
-        run: cd ./test && ./run.sh
+        run: cd test && ./run.sh
       - name: Run integration tests
         id: go_test_integration
-        run: cd ./integration && ./run.sh
+        run: cd integration && ./run.sh
   build:
 
     runs-on: ubuntu-latest
