@@ -30,7 +30,7 @@ jobs:
         ref: ${{github.ref}}
     - name: 'Get Previous tag'
       id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@master"
+      run: echo ::set-output name=tag::$(echogit describe --abbrev=0 --tags)
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     - name: Build the Docker image
