@@ -1,4 +1,4 @@
-name: Docker Image LATEST
+name: Docker Image TAG
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
           ref: ${{github.ref}}
       - name: 'Get Previous tag'
         id: previoustag
-        run: echo ::set-output name=tag::$(echogit describe --abbrev=0 --tags)
+        run: echo ::set-output name=tag::$(echo git describe --abbrev=0 --tags)
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Build the Docker image
