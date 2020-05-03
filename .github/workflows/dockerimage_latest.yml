@@ -20,7 +20,7 @@ jobs:
       - name: Run integration tests
         id: go_test_integration
         run: cd integration && chmod +x ./run.sh && ./run.sh
-  build:
+  deploy:
 
     runs-on: ubuntu-latest
 
