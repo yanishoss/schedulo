@@ -16,10 +16,10 @@ jobs:
           ref: ${{github.ref}}
       - name: Run unit tests
         id: go_test_unit
-        run: cd test && ./run.sh
+        run: cd test && chmod +x ./run.sh && ./run.sh
       - name: Run integration tests
         id: go_test_integration
-        run: cd integration && ./run.sh
+        run: cd integration && chmod +x ./run.sh && ./run.sh
   build:
 
     runs-on: ubuntu-latest
