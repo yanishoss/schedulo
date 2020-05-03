@@ -30,3 +30,4 @@ jobs:
         ref: ${{github.ref}}
     - name: Build the Docker image
       run: docker build . --file cmd/schedulo_server/Dockerfile --tag germainion/schedulo:latest && docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} && docker push germainion/schedulo:latest
+      if: ${{test.success()}}
