@@ -9,9 +9,13 @@ import (
 	"time"
 )
 
+const (
+	TimestampMode = core.TimestampMode
+	CronMode = core.TimestampMode
+)
+
 type Event = core.Event
 type ID = core.ID
-
 
 type Client interface {
 	Schedule(ctx context.Context, e Event) (ID, error)

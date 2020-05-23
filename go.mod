@@ -9,7 +9,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.3.3
 	github.com/lib/pq v1.3.0
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/peterbourgon/g2s v0.0.0-20170223122336-d4e7ad98afea // indirect
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/rubyist/circuitbreaker v2.2.1+incompatible
 	github.com/satori/go.uuid v1.2.0
