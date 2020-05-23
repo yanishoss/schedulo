@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/yanishoss/schedulo/api/client"
 	"github.com/yanishoss/schedulo/internal/core"
+	"github.com/yanishoss/schedulo/pkg/schedulo"
 	"os"
 	"testing"
 	"time"
@@ -26,7 +26,7 @@ func generateEvents(n int) []core.Event {
 }
 
 func TestServer(t *testing.T) {
-	cl, err := client.New(os.Getenv("SCHEDULO_ADDR"))
+	cl, err := schedulo.New(os.Getenv("SCHEDULO_ADDR"))
 	defer cl.Close()
 
 	if err != nil {

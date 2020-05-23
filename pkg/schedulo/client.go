@@ -1,4 +1,4 @@
-package client
+package schedulo
 
 import (
 	"context"
@@ -9,11 +9,15 @@ import (
 	"time"
 )
 
+type Event = core.Event
+type ID = core.ID
+
+
 type Client interface {
-	Schedule(ctx context.Context, e core.Event) (core.ID, error)
-	Unschedule(ctx context.Context, id core.ID) error
-	OnEvent(ctx context.Context, topic string, cb func(core.Event), cbErr func(error)) (func(), error)
-	ListenToEvent(ctx context.Context, topic string, cb func(core.Event)) error
+	Schedule(ctx context.Context, e Event) (ID, error)
+	Unschedule(ctx context.Context, id ID) error
+	OnEvent(ctx context.Context, topic string, cb func(Event), cbErr func(error)) (func(), error)
+	ListenToEvent(ctx context.Context, topic string, cb func(Event)) error
 	Close() error
 }
 
