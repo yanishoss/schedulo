@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	circuit "github.com/rubyist/circuitbreaker"
 	"github.com/yanishoss/schedulo/api"
 	"github.com/yanishoss/schedulo/cmd/schedulo_server/config"
 	"github.com/yanishoss/schedulo/cmd/schedulo_server/server"
@@ -12,6 +13,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 )
 
 func main() {
@@ -37,6 +39,8 @@ func main() {
 		cfg.Network.Addr = *addr
 	}
 
+	cb := circuit.NewThresholdBreaker(10)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", cfg.Network.Addr, cfg.Network.Port))
 
 	if err != nil {
@@ -47,20 +51,32 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	cache, err := core.NewRedisCacheManager(core.RedisCacheManagerConfig{
-		Addr: cfg.Cache.Addr,
-		Pass: cfg.Cache.Pass,
-		DB:   cfg.Cache.DB,
-	})
+	var cache core.CacheManager
+
+	err = cb.Call(func() error {
+		cache, err = core.NewRedisCacheManager(core.RedisCacheManagerConfig{
+			Addr: cfg.Cache.Addr,
+			Pass: cfg.Cache.Pass,
+			DB:   cfg.Cache.DB,
+		})
+
+		return err
+	}, time.Second*4)
 
 	if err != nil {
 		log.Fatalf("failed to initialize Redis: %v\n", err)
 	}
 
-	pers, err := core.NewSqlPersistenceManager(cache, core.SqlPersistenceManagerConfig{
-		Url:    cfg.Database.Url,
-		Driver: cfg.Database.Driver,
-	})
+	var pers core.PersistenceManager
+
+	err = cb.Call(func() error {
+		pers, err = core.NewSqlPersistenceManager(cache, core.SqlPersistenceManagerConfig{
+			Url:    cfg.Database.Url,
+			Driver: cfg.Database.Driver,
+		})
+
+		return err
+	}, time.Second*4)
 
 	if err != nil {
 		log.Fatalf("failed to initialize SQL: %v\n", err)
