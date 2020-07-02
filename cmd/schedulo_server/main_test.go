@@ -26,8 +26,6 @@ func generateEvents(n int) []core.Event {
 }
 
 func TestServer(t *testing.T) {
-	time.Sleep(time.Second*20)
-
 	cl, err := schedulo.New(os.Getenv("SCHEDULO_ADDR"))
 	defer cl.Close()
 
@@ -52,6 +50,7 @@ func TestServer(t *testing.T) {
 	}
 
 	for _, e := range ev {
+		e := e
 		go func(){
 			if _, err := cl.Schedule(context.Background(), e); err != nil {
 				t.Errorf("An error occurred while scheduling event: %v\n", err)
