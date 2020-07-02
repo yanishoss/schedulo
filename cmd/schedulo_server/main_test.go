@@ -26,6 +26,8 @@ func generateEvents(n int) []core.Event {
 }
 
 func TestServer(t *testing.T) {
+	time.Sleep(time.Second*20)
+
 	cl, err := schedulo.New(os.Getenv("SCHEDULO_ADDR"))
 	defer cl.Close()
 
