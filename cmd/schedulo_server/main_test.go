@@ -59,7 +59,7 @@ func TestServer(t *testing.T) {
 
 	start := time.Now()
 	for dispatched != 10 {
-		if time.Now().Sub(start) > time.Minute*2 {
+		if time.Now().Sub(start) > time.Minute*5 {
 			break
 		}
 	}
