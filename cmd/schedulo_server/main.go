@@ -13,7 +13,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"time"
 )
 
 func main() {
@@ -61,7 +60,7 @@ func main() {
 		})
 
 		return err
-	}, time.Second*4)
+	}, 0)
 
 	if err != nil {
 		log.Fatalf("failed to initialize Redis: %v\n", err)
@@ -76,7 +75,7 @@ func main() {
 		})
 
 		return err
-	}, time.Second*4)
+	}, 0)
 
 	if err != nil {
 		log.Fatalf("failed to initialize SQL: %v\n", err)
