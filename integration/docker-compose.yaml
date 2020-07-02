@@ -21,7 +21,7 @@ services:
     environment:
       SCHEDULO_SQL_URL: "host=postgres port=5432 dbname=job_scheduler user=job_scheduler password='job_scheduler' sslmode=disable"
       SCHEDULO_REDIS_ADDR: "redis:6379"
-      SCHEDULO_ADDR: 0.0.0.0
+      SCHEDULO_ADDR: ''
     links:
       - redis
       - postgres
