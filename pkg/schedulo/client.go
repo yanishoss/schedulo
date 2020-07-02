@@ -31,7 +31,7 @@ type client struct {
 }
 
 func New(addr string) (Client, error) {
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*20)
+	ctx := context.Background()
 	conn, err := grpc.DialContext(ctx, addr, grpc.WithInsecure(), grpc.WithBlock())
 
 	if err != nil {
