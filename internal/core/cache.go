@@ -48,7 +48,7 @@ func (cache *redisCacheManager) Add(ctx context.Context, e Event) error {
 	defer conn.Close()
 
 	cmd := conn.HMSet(
-		string(e.ID),
+		"schedulo_ns:"+string(e.ID),
 		"cron_expression", e.CronExpression,
 		"should_execute_at", e.ShouldExecuteAt.Format(time.RFC3339Nano),
 		"mode", int(e.Mode),
@@ -60,7 +60,7 @@ func (cache *redisCacheManager) Add(ctx context.Context, e Event) error {
 		return err
 	}
 
-	cmd = conn.Expire(string(e.ID), time.Minute*30)
+	cmd = conn.Expire("schedulo_ns:"+string(e.ID), time.Minute*30)
 
 	if err := cmd.Err(); err != nil {
 		return err
@@ -78,7 +78,7 @@ func (cache *redisCacheManager) AddBulk(ctx context.Context, evs []Event) error 
 
 	for _, e := range evs {
 		cmd := pip.HMSet(
-			string(e.ID),
+			"schedulo_ns:"+string(e.ID),
 			"cron_expression", e.CronExpression,
 			"should_execute_at", e.ShouldExecuteAt.Format(time.RFC3339Nano),
 			"mode", int(e.Mode),
@@ -90,7 +90,7 @@ func (cache *redisCacheManager) AddBulk(ctx context.Context, evs []Event) error 
 			return err
 		}
 
-		cmd = pip.Expire(string(e.ID), time.Minute*30)
+		cmd = pip.Expire("schedulo_ns:"+string(e.ID), time.Minute*30)
 
 		if err := cmd.Err(); err != nil {
 			return err
@@ -110,7 +110,7 @@ func (cache *redisCacheManager) Get(ctx context.Context, id ID) (Event, error) {
 	conn := cache.c.Conn()
 	defer conn.Close()
 
-	cmd := conn.Exists(string(id))
+	cmd := conn.Exists("schedulo_ns:"+string(id))
 
 	if err := cmd.Err(); err != nil {
 		return Event{}, err
@@ -120,7 +120,7 @@ func (cache *redisCacheManager) Get(ctx context.Context, id ID) (Event, error) {
 		return Event{}, ErrNotFound
 	}
 
-	cmdGet := conn.HGetAll(string(id))
+	cmdGet := conn.HGetAll("schedulo_ns:"+string(id))
 
 	if err := cmdGet.Err(); err != nil {
 		return Event{}, err
@@ -158,7 +158,7 @@ func (cache *redisCacheManager) Delete(ctx context.Context, id ID) error {
 	conn := cache.c.Conn()
 	defer conn.Close()
 
-	cmd := conn.Del(string(id))
+	cmd := conn.Del("schedulo_ns:"+string(id))
 
 	if err := cmd.Err(); err != nil {
 		return err
