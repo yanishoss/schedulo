@@ -44,7 +44,7 @@ func New(addr string) (Client, error) {
 }
 
 func (cl *client) Schedule(ctx context.Context, e core.Event) (core.ID, error) {
-	ctx, _ = context.WithTimeout(ctx, 60*time.Second)
+	ctx, _ = context.WithTimeout(ctx, 20*time.Second)
 
 	ev := coreEventToApiEvent(e)
 
@@ -58,7 +58,7 @@ func (cl *client) Schedule(ctx context.Context, e core.Event) (core.ID, error) {
 }
 
 func (cl *client) Unschedule(ctx context.Context, id core.ID) error {
-	ctx, _ = context.WithTimeout(ctx, 60*time.Second)
+	ctx, _ = context.WithTimeout(ctx, 20*time.Second)
 
 	_, err := cl.c.Unschedule(ctx, &api.UnscheduleRequest{
 		Id: &api.Event_ID{
