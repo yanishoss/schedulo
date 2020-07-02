@@ -113,7 +113,7 @@ func (cl *client) OnEvent(ctx context.Context, topic string, cb func(core.Event)
 					break
 				}
 
-				cb(apiEventToCoreEvent(*resp.Event))
+				go cb(apiEventToCoreEvent(*resp.Event))
 			}
 		}
 	}()
@@ -145,7 +145,7 @@ func (cl *client) ListenToEvent(ctx context.Context, topic string, cb func(core.
 				return err
 			}
 
-			cb(apiEventToCoreEvent(*resp.Event))
+			go cb(apiEventToCoreEvent(*resp.Event))
 		}
 	}
 }
