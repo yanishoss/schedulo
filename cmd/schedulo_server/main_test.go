@@ -54,6 +54,7 @@ func TestServer(t *testing.T) {
 	}
 
 	for _, e := range ev {
+		e := e
 		go func() {
 			if _, err := cl.Schedule(context.Background(), e); err != nil {
 				t.Errorf("An error occurred while scheduling event: %v\n", err)
@@ -65,16 +66,15 @@ func TestServer(t *testing.T) {
 
 	ctx , _ := context.WithTimeout(context.Background(), 2*time.Minute)
 	for {
+		if dispatched == 10 {
+			break
+		}
+
 		select {
 		case <-ctx.Done():
 			t.Fatal(ctx.Err())
-		default:
-			if dispatched == 10 {
-				goto getout
-			}
+		default: {}
 		}
-		getout:
-			break
 	}
 
 	if dispatched != 10 {
