@@ -101,7 +101,7 @@ func (cl *client) OnEvent(ctx context.Context, topic string, cb func(core.Event)
 					break
 				}
 
-				cb(apiEventToCoreEvent(*resp.Event))
+				go cb(apiEventToCoreEvent(*resp.Event))
 			}
 		}
 	}()
@@ -124,10 +124,6 @@ func (cl *client) ListenToEvent(ctx context.Context, topic string, cb func(core.
 			return stream.Context().Err()
 		default:
 			resp, err := stream.Recv()
-
-			if err == io.EOF {
-				return nil
-			}
 
 			if err != nil {
 				return err
