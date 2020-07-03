@@ -64,7 +64,7 @@ func TestServer(t *testing.T) {
 		}()
 	}
 
-	time.Sleep(180*time.Second)
+	time.Sleep(240*time.Second)
 
 	if dispatched != 5 {
 		t.Fatalf("Not every events got dispatched: expected: 5, got: %d\n", dispatched)
