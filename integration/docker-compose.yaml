@@ -1,20 +1,25 @@
 version: '3.3'
 services:
-  #go_test:
-  # depends_on:
-  #   - server
-  # build:
-  #   context: ../
-  #   dockerfile: ./integration/Dockerfile.test
-  # environment:
-  #   SCHEDULO_ADDR: 'server:9876'
-  # links:
-  #   - server
+  go_test:
+   depends_on:
+     - server
+   build:
+     context: ../
+     dockerfile: ./integration/Dockerfile.test
+   environment:
+     SCHEDULO_ADDR: 'server:9876'
+   links:
+     - server
   server:
-    restart: always
+    restart: on-failure
     depends_on:
       - redis
       - postgres
+    healthcheck:
+      test: ["CMD", "nc", "localhost", "9876"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
     build:
       context: ../
       dockerfile: ./cmd/schedulo_server/Dockerfile
@@ -29,10 +34,18 @@ services:
       - postgres
   redis:
     image: redis
-    restart: always
+    healthcheck:
+      test: ["CMD", "nc", "localhost", "6379"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
   postgres:
     image: postgres
-    restart: always
+    healthcheck:
+      test: ["CMD", "nc", "localhost", "5432"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
     environment:
       POSTGRES_USER: job_scheduler
       POSTGRES_PASSWORD: job_scheduler
