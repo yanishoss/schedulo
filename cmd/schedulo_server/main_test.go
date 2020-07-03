@@ -18,7 +18,7 @@ func generateEvents(n int) []core.Event {
 		ev[i] = core.Event{
 			Mode:            core.TimestampMode,
 			Topic: "test",
-			ShouldExecuteAt: time.Now(),
+			ShouldExecuteAt: time.Now().Add(20*time.Second).Add(time.Second*2*time.Duration(i)),
 		}
 	}
 
@@ -52,20 +52,22 @@ func TestServer(t *testing.T) {
 		t.Errorf("An error occurred while listening to events: %v\n", err)
 	}
 
+	start := time.Now()
 	for _, e := range ev {
-		e := e
-		go func(){
-			if _, err := cl.Schedule(context.Background(), e); err != nil {
-				t.Errorf("An error occurred while scheduling event: %v\n", err)
-			}
-			t.Log("Event scheduled...")
-		}()
+		if _, err := cl.Schedule(context.Background(), e); err != nil {
+			t.Errorf("An error occurred while scheduling event: %v\n", err)
+		}
+		t.Log("Event scheduled...")
 	}
 
-	start := time.Now()
+	dur := time.Now().Sub(start).Seconds()
+	t.Logf("it took %.2f to dispatch 10 events\n", dur)
+
+
+	ctx , _ := context.WithTimeout(context.Background(), time.Minute)
 	for dispatched != 10 {
-		if time.Now().Sub(start) > time.Second*30 {
-			break
+		if err := ctx.Err(); err != nil {
+			t.Fatal(err)
 		}
 	}
 
