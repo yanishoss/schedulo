@@ -5,6 +5,7 @@ import (
 	"github.com/yanishoss/schedulo/internal/core"
 	"github.com/yanishoss/schedulo/pkg/schedulo"
 	"os"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -38,10 +39,10 @@ func TestServer(t *testing.T) {
 
 	t.Logf("Created client...\n")
 
-	dispatched := 0
+	var dispatched int32
 
 	close_, err := cl.OnEvent(context.Background(), "test", func(e core.Event) {
-		dispatched++
+		atomic.AddInt32(&dispatched, 1)
 		t.Log("Event dispatched")
 	}, func (err1 error) {
 		if err1 != nil {
@@ -63,19 +64,7 @@ func TestServer(t *testing.T) {
 		}()
 	}
 
-
-	ctx , _ := context.WithTimeout(context.Background(), 7*time.Minute)
-	for {
-		if dispatched == 5 {
-			break
-		}
-
-		select {
-		case <-ctx.Done():
-			t.Fatal(ctx.Err())
-		default: {}
-		}
-	}
+	time.Sleep(30*time.Second)
 
 	if dispatched != 5 {
 		t.Fatalf("Not every events got dispatched: expected: 5, got: %d\n", dispatched)
