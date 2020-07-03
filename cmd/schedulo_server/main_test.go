@@ -53,7 +53,6 @@ func TestServer(t *testing.T) {
 		t.Errorf("An error occurred while listening to events: %v\n", err)
 	}
 
-	start := time.Now()
 	for _, e := range ev {
 		go func() {
 			if _, err := cl.Schedule(context.Background(), e); err != nil {
@@ -63,15 +62,19 @@ func TestServer(t *testing.T) {
 		}()
 	}
 
-	dur := time.Now().Sub(start).Seconds()
-	t.Logf("it took %.2f to dispatch 10 events\n", dur)
 
-
-	ctx , _ := context.WithTimeout(context.Background(), time.Minute)
-	for dispatched != 10 {
-		if err := ctx.Err(); err != nil {
-			t.Fatal(err)
+	ctx , _ := context.WithTimeout(context.Background(), 2*time.Minute)
+	for {
+		select {
+		case <-ctx.Done():
+			t.Fatal(ctx.Err())
+		default:
+			if dispatched == 10 {
+				goto getout
+			}
 		}
+		getout:
+			break
 	}
 
 	if dispatched != 10 {
