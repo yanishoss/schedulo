@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var ev = generateEvents(5)
+var ev = generateEvents(30)
 
 func generateEvents(n int) []core.Event {
 	ev := make([]core.Event, n)
@@ -56,7 +56,7 @@ func TestServer(t *testing.T) {
 
 	for _, e := range ev {
 		e := e
-		func() {
+		go func() {
 			if _, err := cl.Schedule(context.Background(), e); err != nil {
 				t.Errorf("An error occurred while scheduling event: %v\n", err)
 			}
@@ -65,7 +65,7 @@ func TestServer(t *testing.T) {
 	}
 
 	start := time.Now()
-	for dispatched < 5 {
+	for dispatched < 30 {
 		if time.Now().Sub(start) > time.Minute*2 {
 			break
 		}
@@ -74,7 +74,7 @@ func TestServer(t *testing.T) {
 	t.Logf("Events took %.2fs to be dispatched\n", time.Now().Sub(start).Seconds())
 
 	if dispatched < 5 {
-		t.Fatalf("Not every events got dispatched: expected: 5, got: %d\n", dispatched)
+		t.Fatalf("Not every events got dispatched: expected: 30, got: %d\n", dispatched)
 	}
 
 	if err := cl.Close(); err != nil {
