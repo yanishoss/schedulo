@@ -38,9 +38,7 @@ func main() {
 		cfg.Network.Addr = *addr
 	}
 
-	cb := circuit.NewBreakerWithOptions(&circuit.Options{ShouldTrip: func(b *circuit.Breaker) bool {
-		return false
-	}})
+	cb := circuit.NewConsecutiveBreaker(1000)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", cfg.Network.Addr, cfg.Network.Port))
 
