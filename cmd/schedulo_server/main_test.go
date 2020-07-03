@@ -26,7 +26,10 @@ func generateEvents(n int) []core.Event {
 }
 
 func TestServer(t *testing.T) {
-	cl, err := schedulo.New(os.Getenv("SCHEDULO_ADDR"))
+	addr := os.Getenv("SCHEDULO_ADDR")
+
+	t.Logf("Trying to connect to %s server\n", addr)
+	cl, err := schedulo.New(addr)
 	defer cl.Close()
 
 	if err != nil {
