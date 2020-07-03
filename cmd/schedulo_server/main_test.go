@@ -64,7 +64,7 @@ func TestServer(t *testing.T) {
 	}
 
 
-	ctx , _ := context.WithTimeout(context.Background(), 2*time.Minute)
+	ctx , _ := context.WithTimeout(context.Background(), 7*time.Minute)
 	for {
 		if dispatched == 10 {
 			break
