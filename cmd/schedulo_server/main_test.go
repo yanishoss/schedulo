@@ -56,7 +56,7 @@ func TestServer(t *testing.T) {
 
 	for _, e := range ev {
 		e := e
-		go func() {
+		func() {
 			if _, err := cl.Schedule(context.Background(), e); err != nil {
 				t.Errorf("An error occurred while scheduling event: %v\n", err)
 			}
@@ -64,9 +64,16 @@ func TestServer(t *testing.T) {
 		}()
 	}
 
-	time.Sleep(240*time.Second)
+	start := time.Now()
+	for dispatched < 5 {
+		if time.Now().Sub(start) > time.Minute*2 {
+			break
+		}
+	}
 
-	if dispatched != 5 {
+	t.Logf("Events took %.2fs to be dispatched\n", time.Now().Sub(start).Seconds())
+
+	if dispatched < 5 {
 		t.Fatalf("Not every events got dispatched: expected: 5, got: %d\n", dispatched)
 	}
 
