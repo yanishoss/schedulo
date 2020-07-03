@@ -101,19 +101,21 @@ func (cl *client) OnEvent(ctx context.Context, topic string, cb func(core.Event)
 				cbErr(stream.Context().Err())
 				return
 			default:
-				resp, err := stream.Recv()
+				go func() {
+					resp, err := stream.Recv()
 
-				if err == io.EOF {
-					cbErr(err)
-					return
-				}
+					if err == io.EOF {
+						cbErr(err)
+						done <- true
+					}
 
-				if err != nil {
-					cbErr(err)
-					break
-				}
+					if err != nil {
+						cbErr(err)
+						return
+					}
 
-				go cb(apiEventToCoreEvent(*resp.Event))
+					cb(apiEventToCoreEvent(*resp.Event))
+				}()
 			}
 		}
 	}()
