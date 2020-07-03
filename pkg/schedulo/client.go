@@ -20,7 +20,7 @@ type ID = core.ID
 type Client interface {
 	Schedule(ctx context.Context, e Event) (ID, error)
 	Unschedule(ctx context.Context, id ID) error
-	OnEvent(ctx context.Context, topic string, cb func(Event), cbErr func(error)) (func(), error)
+	OnEvent(ctx context.Context, topic string, cb func(Event), cbErr func(error)) error
 	ListenToEvent(ctx context.Context, topic string, cb func(Event)) error
 	Close() error
 }
@@ -73,54 +73,40 @@ func (cl *client) Close() error {
 	return cl.conn.Close()
 }
 
-func (cl *client) OnEvent(ctx context.Context, topic string, cb func(core.Event), cbErr func(error)) (func(), error) {
+func (cl *client) OnEvent(ctx context.Context, topic string, cb func(core.Event), cbErr func(error)) error {
 	stream, err := cl.c.StreamEvents(ctx, &api.StreamEventsRequest{
 		Topic: topic,
 	})
 
 	if err != nil {
-		return nil, err
-	}
-
-	done := make(chan bool)
-
-	close_ := func() {
-		done <- true
+		return err
 	}
 
 	go func() {
 		for {
 			select {
-			case <- done:
-				if err := stream.CloseSend(); err != nil {
-					cbErr(err)
-				}
-
-				return
 			case <- stream.Context().Done():
 				cbErr(stream.Context().Err())
 				return
 			default:
-				go func() {
-					resp, err := stream.Recv()
+				resp, err := stream.Recv()
 
-					if err == io.EOF {
-						cbErr(err)
-						done <- true
-					}
+				if err == io.EOF {
+					cbErr(err)
+					return
+				}
 
-					if err != nil {
-						cbErr(err)
-						return
-					}
+				if err != nil {
+					cbErr(err)
+					break
+				}
 
-					cb(apiEventToCoreEvent(*resp.Event))
-				}()
+				cb(apiEventToCoreEvent(*resp.Event))
 			}
 		}
 	}()
 
-	return close_, nil
+	return nil
 }
 
 func (cl *client) ListenToEvent(ctx context.Context, topic string, cb func(core.Event)) error {

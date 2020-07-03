@@ -41,7 +41,7 @@ func TestServer(t *testing.T) {
 
 	var dispatched int32
 
-	close_, err := cl.OnEvent(context.Background(), "test", func(e core.Event) {
+	err = cl.OnEvent(context.Background(), "test", func(e core.Event) {
 		atomic.AddInt32(&dispatched, 1)
 		t.Log("Event dispatched")
 	}, func (err1 error) {
@@ -77,5 +77,7 @@ func TestServer(t *testing.T) {
 		t.Fatalf("Not every events got dispatched: expected: 5, got: %d\n", dispatched)
 	}
 
-	close_()
+	if err := cl.Close(); err != nil {
+		t.Fatal(err)
+	}
 }
