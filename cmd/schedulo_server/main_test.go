@@ -58,6 +58,7 @@ func TestServer(t *testing.T) {
 			if _, err := cl.Schedule(context.Background(), e); err != nil {
 				t.Errorf("An error occurred while scheduling event: %v\n", err)
 			}
+			t.Log("Event scheduled...")
 		}()
 	}
 
