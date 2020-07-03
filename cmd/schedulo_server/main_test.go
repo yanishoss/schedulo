@@ -18,7 +18,7 @@ func generateEvents(n int) []core.Event {
 		ev[i] = core.Event{
 			Mode:            core.TimestampMode,
 			Topic: "test",
-			ShouldExecuteAt: time.Now().Add(time.Duration(time.Second.Nanoseconds() * int64(i+1))),
+			ShouldExecuteAt: time.Now(),
 		}
 	}
 
@@ -63,7 +63,7 @@ func TestServer(t *testing.T) {
 
 	start := time.Now()
 	for dispatched != 10 {
-		if time.Now().Sub(start) > time.Minute*5 {
+		if time.Now().Sub(start) > time.Second*30 {
 			break
 		}
 	}
