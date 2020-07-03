@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var ev = generateEvents(10)
+var ev = generateEvents(5)
 
 func generateEvents(n int) []core.Event {
 	ev := make([]core.Event, n)
@@ -66,7 +66,7 @@ func TestServer(t *testing.T) {
 
 	ctx , _ := context.WithTimeout(context.Background(), 7*time.Minute)
 	for {
-		if dispatched == 10 {
+		if dispatched == 5 {
 			break
 		}
 
@@ -77,8 +77,8 @@ func TestServer(t *testing.T) {
 		}
 	}
 
-	if dispatched != 10 {
-		t.Fatalf("Not every events got dispatched: expected: 10, got: %d\n", dispatched)
+	if dispatched != 5 {
+		t.Fatalf("Not every events got dispatched: expected: 5, got: %d\n", dispatched)
 	}
 
 	close_()
