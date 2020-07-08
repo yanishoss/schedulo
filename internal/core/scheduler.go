@@ -129,11 +129,11 @@ func (sch *scheduler) schedule(e event) {
 func (sch *scheduler) run() {
 	fn := func() {
 		sch.queue.Lock()
-		defer sch.queue.Unlock()
-
 		if sch.queue.len == 0 {
+			sch.queue.Unlock()
 			return
 		}
+		sch.queue.Unlock()
 
 		rate := sch.inputMetrics.OpRate()
 
@@ -145,6 +145,7 @@ func (sch *scheduler) run() {
 
 		evs := make([]Event, 0, limit)
 
+		sch.queue.Lock()
 		for i := 0; i < limit; i++ {
 			e := sch.queue.Pop()
 
@@ -154,6 +155,7 @@ func (sch *scheduler) run() {
 
 			evs = append(evs, *e)
 		}
+		sch.queue.Unlock()
 
 		cb := circuit.NewThresholdBreaker(12)
 
