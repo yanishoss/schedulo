@@ -6,6 +6,7 @@ import (
 	circuit "github.com/rubyist/circuitbreaker"
 	uuid "github.com/satori/go.uuid"
 	"math"
+	"runtime"
 	"time"
 )
 
@@ -191,6 +192,7 @@ func (sch *scheduler) run() {
 			return
 		default:
 			fn()
+			runtime.Gosched()
 		}
 	}
 }

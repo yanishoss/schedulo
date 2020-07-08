@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"runtime"
 )
 
 type DispatchFunc func(Event) error
@@ -96,10 +97,12 @@ func (d *_dispatchManager) run() {
 			d.qu.Unlock()
 
 			if e == nil {
+				runtime.Gosched()
 				break
 			}
 
 			d.dispatch(*e)
+			runtime.Gosched()
 		}
 	}
 }

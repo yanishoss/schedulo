@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"runtime"
 	"time"
 )
 
@@ -41,6 +42,7 @@ func (p *_processingWorker) Run() {
 				return
 			default:
 				p.process()
+				runtime.Gosched()
 			}
 		}
 	}()
